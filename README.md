@@ -12,3 +12,7 @@ Start webserver
 ```
 python3 app.py
 ```
+
+### Javascript Libs
+* jQuery - https://jquery.com/
+* webcamjs - https://github.com/jhuckaby/webcamjs
