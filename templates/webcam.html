@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>WebcamJS Test Page</title>
+	<style type="text/css">
+		body { font-family: Helvetica, sans-serif; }
+		h2, h3 { margin-top:0; }
+		form { margin-top: 15px; }
+		form > input { margin-right: 15px; }
+		#results { float:right; margin:20px; padding:20px; border:1px solid; background:#ccc; }
+	</style>
+</head>
+<body>
+	<div id="results">Your captured image will appear here...</div>
+	
+	<h1>WebcamJS Test Page</h1>
+	<h3>Demonstrates simple 320x240 capture &amp; display</h3>
+	
+	<div id="my_camera"></div>
+	
+	<!-- First, include the Webcam.js JavaScript Library -->
+  <script src="/static/js/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/webcam.min.js"></script>
+	
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+		Webcam.set({
+			width: 320,
+			height: 240,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+		Webcam.attach( '#my_camera' );
+	</script>
+	
+	<!-- A button for taking snaps -->
+	<form>
+		<input type=button value="Take Snapshot" onClick="take_snapshot()">
+    <input type='button' value='Upload to Server' id='btn_to_server'>
+	</form>
+
+  <br>
+  <br>
+  <h3>Latest photo from server</h3>
+  <img id='latest' src='/static/latest.jpg'>
+	
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+    var b64img = null;
+
+		function take_snapshot() {
+			// take snapshot and get image data
+			Webcam.snap( function(data_uri) {
+        // update b64img
+        b64img = data_uri;
+				// display results in page
+				document.getElementById('results').innerHTML = 
+					'<h2>Here is your image:</h2>' + 
+					'<img src="'+data_uri+'"/>';
+			} );
+		}
+
+    $('#btn_to_server').click(function(){
+      if(b64img == null){
+        alert("Take Snapshot first");
+      }
+      else {
+        $.ajax({
+          url: '/save_photo',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify({
+            img: b64img,
+          }),
+          success: (resp) => {
+            if(resp.success){
+              var latest_img = $('#latest')[0];
+              latest_img.src = latest_img.src + '?t=' + new Date().getTime();
+            }
+          }
+        });
+      }
+    });
+
+	</script>
+	
+</body>
+</html>
