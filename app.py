@@ -41,5 +41,21 @@ def save_photo():
         'message': 'done',
     })
 
+@app.route('/callback', methods=['GET', 'POST'])
+def callback():
+
+    print('----- GET -----')
+    print(request.args.to_dict(flat=False))
+
+    print('----- POST -----')
+    print(request.form.to_dict(flat=False))
+
+    print('----- JSON -----')
+    print(request.get_json())
+
+    print('----------------')
+
+    return 'view flask log'
+
 if __name__ == '__main__':
     app.run(debug=True)
